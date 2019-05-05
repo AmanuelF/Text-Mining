@@ -5,7 +5,6 @@ feature extractor
 
 '''
 
-
 import nltk
 from collections import defaultdict
 from nltk.stem.snowball import EnglishStemmer 
@@ -185,8 +184,16 @@ def class_defn_gen(class_defn_file, rootdir):
             sub_dir_count += 1
 
 
-featureids_terms = [line.rstrip('\n') for line in open('feature_definition_file')]
-class_definition_file = [line.rstrip('\n') for line in open('class_definition_file.csv')]  #added on 0416
+
+def feature_id_gen(feature_defn_file):
+    featureids_terms = [line.rstrip('\n') for line in open(feature_defn_file)]
+    return featureids_terms
+def class_defn_pair_gen(class_defn_file):
+    class_definition_file = [line.rstrip('\n') for line in open(class_defn_file)]  #added on 0416
+    return class_definition_file
+
+#featureids_terms = [line.rstrip('\n') for line in open('feature_definition_file')]
+#class_definition_file = [line.rstrip('\n') for line in open('class_definition_file.csv')]  #added on 0416
 class_definition_pairs = {}
 
 #method to compute normalized term frequency of a term in a document
@@ -195,7 +202,7 @@ def tf_compute(doc, term):
     return tf
 
 #method to generate TF based training dataset
-def training_data_tf_gen(training_data_tf_based):    
+def training_data_tf_gen(training_data_tf_based,featureids_terms,class_definition_file):    
     #training data file generation snippet---tf-based(term frequency based training dataset)
 
     #iterates through each newgroup to class mapping
@@ -272,7 +279,7 @@ def idf_compute(nDocs, nDocs_term):
 
 
 #method to generate IDF based training dataset
-def training_data_idf_gen(training_data_idf_based,inv_index):
+def training_data_idf_gen(training_data_idf_based,inv_index,featureids_terms,class_definition_file):
     for pair in class_definition_file:
         key = pair.lstrip('(').rstrip(')').split(', ',1)[0].replace("'",'')
         value = pair.lstrip('(').rstrip(')').split(', ',1)[1].replace("'",'')
@@ -327,7 +334,7 @@ def training_data_idf_gen(training_data_idf_based,inv_index):
     
 
 #method to generate TF-IDF based training dataset
-def training_data_tf_idf_gen(training_data_tf_idf_based,inv_index):
+def training_data_tf_idf_gen(training_data_tf_idf_based,inv_index,featureids_terms,class_definition_file):
     for pair in class_definition_file:
         key = pair.lstrip('(').rstrip(')').split(', ',1)[0].replace("'",'')
         value = pair.lstrip('(').rstrip(')').split(', ',1)[1].replace("'",'')
@@ -410,15 +417,18 @@ if __name__ == '__main__':
 
 
     train_data_file = sys.argv[4]
+
+    featureids_terms = feature_id_gen(feature_defn_file)
+    class_definition_file = class_defn_pair_gen(class_defn_file)
     
     #generates either term-frequency based, inverse document frequency based or TF-IDF based training dataset
     #file 
     if '.TF' in train_data_file:
-        training_data_tf_gen(train_data_file)
+        training_data_tf_gen(train_data_file,featureids_terms,class_definition_file)
     elif '.IDF' in train_data_file:
-        training_data_idf_gen(train_data_file,inv_index)
+        training_data_idf_gen(train_data_file,inv_index,featureids_terms,class_definition_file)
     elif '.TFIDF' in train_data_file:
-        training_data_tf_idf_gen(train_data_file,inv_index)
+        training_data_tf_idf_gen(train_data_file,inv_index,featureids_terms,class_definition_file)
     else:
         print("Use file names with extensions '.TF', '.IDF' or '.TFIDF' ")
 

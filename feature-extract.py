@@ -1,6 +1,5 @@
 '''
 Authors: Manas Gaur, Amanuel Alambo
-Instructor: Dr. keke Chen
 feature extractor
 
 '''
